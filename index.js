@@ -1,47 +1,36 @@
 // Tutaj napisz swój kod
+const trElements = document.querySelectorAll('tbody tr');
+const tableBody = document.querySelector('tbody');
+const arrow = document.querySelector('a');
 
-const trElements = document.querySelectorAll("tbody tr");
-const tableBody = document.querySelector("tbody");
-const buttonSort = document.querySelector("a");
+const sortData = () => {
+  arrow.firstChild.classList.toggle('fa-caret-down');
+  arrow.firstChild.classList.toggle('fa-caret-up');
+  const datasArray = [];
 
-const datasArray = [];
-const sortData = (e) => {
-  trElements.forEach((el) => el.remove());
-
-  trElements.forEach((element) => {
-    const tdElement = element.querySelectorAll("td");
+  trElements.forEach(element => {
+    const tdElement = element.querySelectorAll('td');
     let newData = {
       method: tdElement[0].innerHTML,
       name: tdElement[1].innerHTML,
-      time: tdElement[2].innerHTML,
+      time: tdElement[2].innerHTML
     };
     datasArray.push(newData);
   });
-  console.log(datasArray);
-
   datasArray.sort(sortNumbers);
-  addSortedData();
+  addSortedData(datasArray);
 };
 
 const sortNumbers = (a, b) => {
-  return a.time - b.time;
+  if (arrow.firstChild.classList.contains('fa-caret-down')) {
+    return a.time - b.time;
+  } else {
+    return b.time - a.time;
+  }
 };
 
-const addSortedData = () => {
-  let newElement = "";
-  datasArray.forEach((obj) => {
-    secondsFormat(obj);
-    newElement += `<tr>
-      <td class="border px-4 py-2">${obj.method}</td>
-      <td class="border px-4 py-2">${obj.name}</td>
-      <td class="border px-4 py-2">${secondsFormat(obj.time)}</td>
-    </tr>`;
-    tableBody.innerHTML = newElement;
-  });
-};
-
-const secondsFormat = (seconds1) => {
-  let secondsToNumber = parseInt(seconds1); // zmienić nazwę zmiennej!!!
+const secondsFormat = numberOfSeconds => {
+  let secondsToNumber = parseInt(numberOfSeconds); // zmienić nazwę zmiennej!!!
   let hours = Math.floor(secondsToNumber / 3600);
   let minutes = Math.floor((secondsToNumber - hours * 3600) / 60);
   let seconds = Math.floor(secondsToNumber - hours * 3600 - minutes * 60);
@@ -58,4 +47,28 @@ const secondsFormat = (seconds1) => {
   return `${hours}:${minutes}:${seconds}`;
 };
 
-buttonSort.addEventListener("click", sortData);
+const addAnimation = () => {
+  const allTdElements = document.querySelectorAll('tbody tr td');
+  allTdElements.forEach(td => {
+    td.classList.add('fade');
+    setTimeout(() => {
+      td.classList.remove('fade');
+    }, 500);
+  });
+};
+
+const addSortedData = datasArray => {
+  tableBody.innerHTML = '';
+  datasArray.forEach(({ method, name, time }) => {
+    let newElement = `<tr> 
+                          <td class="border px-4 py-2">${method}</td>
+                          <td class="border px-4 py-2">${name}</td>
+                          <td class="border px-4 py-2">${secondsFormat(
+                            time
+                          )}</td>
+                      </tr>`;
+    tableBody.innerHTML += newElement;
+  });
+  addAnimation();
+};
+arrow.addEventListener('click', sortData);
